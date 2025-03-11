@@ -1,0 +1,54 @@
+# Layer: disagg-40507
+lat,lon,trt,imt,poe_0.032189,poe_0.004438,poe_0.002105,poe_0.001026,poe_0.000404
+-4.198,-69.942,Active Shallow Crust,PGA,0,0.0044636353850364685,0.0021117818541824818,0.0010287514887750149,0.00040615099715068936
+-4.198,-69.942,Active Shallow Crust,SA(0.1),0,0.004448401741683483,0.0021104742772877216,0.0010282673174515367,0.00040616479236632586
+-4.198,-69.942,Active Shallow Crust,SA(0.2),0,0.004458073526620865,0.0021121958270668983,0.0010263281874358654,0.00040409175562672317
+-4.198,-69.942,Active Shallow Crust,SA(0.3),0,0.004466764163225889,0.0021148223895579576,0.0010289710480719805,0.00040475488640367985
+-4.198,-69.942,Active Shallow Crust,SA(0.5),0,0.004469363018870354,0.002117337891831994,0.0010277569526806474,0.00040495392750017345
+-4.198,-69.942,Active Shallow Crust,SA(0.7),0,0.004466938320547342,0.0021165998186916113,0.0010299257701262832,0.0004041058709844947
+-4.198,-69.942,Active Shallow Crust,SA(1.0),0,0,0.002115498762577772,0.0010309548815712333,0.00040491329855285585
+-4.198,-69.942,Active Shallow Crust,SA(1.5),0,0,0.002116067800670862,0.0010280754650011659,0.0004043699009343982
+-4.198,-69.942,Active Shallow Crust,SA(2.0),0,0,0,0.0010264985030516982,0.00040467685903422534
+-4.198,-69.942,Active Shallow Crust,SA(2.5),0,0,0,0.0010305787436664104,0.00040522211929783225
+-4.198,-69.942,Active Shallow Crust,SA(3.0),0,0,0,0,0.00040622844244353473
+-4.198,-69.942,Active Shallow Crust,SA(4.0),0,0,0,0,0.0004058335325680673
+-4.198,-69.942,Active Shallow Crust,SA(5.0),0,0,0,0,0.00040520355105400085
+-4.198,-69.942,Deep Seismicity,PGA,0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(0.1),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(0.2),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(0.3),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(0.5),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(0.7),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(1.0),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(1.5),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(2.0),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(2.5),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(3.0),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(4.0),0,0,0,0,0
+-4.198,-69.942,Deep Seismicity,SA(5.0),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,PGA,0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(0.1),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(0.2),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(0.3),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(0.5),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(0.7),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(1.0),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(1.5),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(2.0),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(2.5),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(3.0),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(4.0),0,0,0,0,0
+-4.198,-69.942,Subduction Interface,SA(5.0),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,PGA,0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(0.1),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(0.2),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(0.3),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(0.5),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(0.7),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(1.0),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(1.5),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(2.0),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(2.5),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(3.0),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(4.0),0,0,0,0,0
+-4.198,-69.942,Subduction IntraSlab,SA(5.0),0,0,0,0,0

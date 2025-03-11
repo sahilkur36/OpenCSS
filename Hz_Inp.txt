@@ -1,0 +1,28 @@
+# Scenario spectra, DCPP example run
+1								# Run flag. 0 = horizontal and vertical, 1 = horizontal only, 2 = vertical only
+0.75						# Conditioning period
+0.01	10.0				# Period range for selection of scenario spectra
+0.15	1.125				# Period range for strict matching to the UHS curves. Smaller than the previous range
+2.0	8.0					# Mmin and Mmax for selecting candidate scenario spectra
+1								# Flag to specify whether Rrup or Rjb is used to set distance range below. 1 = Rrup, 2 = Rjb.
+0.0    1000.0		# distmin and distmax for selecting candidate scenario spectra
+300.0  435.0		# Vs30min and Vs30max for selecting candidate scenario spectra
+5.0    150.0	  # Durmin and Durmax for selecting candidate scenario spectra
+0.     3000.0		# PGVmin and PGVmax (cm/sec) for selecting candidate scenario spectra
+0.		 1000.0		# Areas intensity (cm/sec) min and max for selecting candidate scenario spectra
+32							# Number of scenario spectra per hazard level
+1000							# Number of Monte Carlo realizations
+700 	0.01			  # Number of iterations on the rates of conditional spectra, delta rate
+10.						# Remove spectra with RateInitial/RateFinal > x 
+
+# Input files
+UHS_0p75s_Seattle.inp
+CMS_0p75s_Seattle.txt
+flatfile.csv
+# Output files
+CSS_Seattle_0p75s_sum.sum						# Summary file containing the main input and output parameters
+CSS_Seattle_0p75s_CS.out1						# Output file containing the list of all scenario spectra, rates, scaling factors
+CSS_Seattle_0p75s_SaH.out2						# Output file containing scaled SaH for the scenario spectra. Only 1 file is needed if Run flag == 1 or 2. 2 files are needed if Run flag = 0.
+CSS_Seattle_0p75s_HazH.out3					# Output file containing the target and computed horiz hazard curves. Only 1 file is needed if Run flag == 1 or 2. 2 files are needed if Run flag = 0.
+CSS_Seattle_0p75s_UHSH.out4					# Output file containing the target and computed horiz UHS curves. Only 1 file is needed if Run flag == 1 or 2. 2 files are needed if Run flag = 0.
+CSS_Seattle_0p75s_filenames.out5			# Output file containing thefilenames of the unique scenario spectra
