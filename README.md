@@ -13,7 +13,7 @@ OpenCSS is an open-source tool that allows users to perform **ground motion sele
 Ensure you have Python installed (recommended **Python 3.8+**). Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/YourUser/OpenCSS.git
+git clone https://github.com/ArtetaResearchGroup/OpenCSS.git
 cd OpenCSS
 pip install -r requirements.txt
 ```
