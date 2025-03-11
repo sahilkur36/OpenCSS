@@ -22,6 +22,6 @@ pip install -r requirements.txt
 python main.py
 ```
 ## Contributors 👨‍💻
-(Jesús D. Caballero)[caballerojd@uninorte.edu.co] (Universidad del Norte, Colombia) 
-(César A. Pájaro) [cesar.pajaromiranda@canterbury.ac.nz] (University of Canterbury, New Zealand)
-(Carlos A. Arteta) [carteta@uninorte.edu.co] (Universidad del Norte, Colombia)
+* [Jesús D. Caballero] (caballerojd@uninorte.edu.co) (Universidad del Norte, Colombia) 
+* [César A. Pájaro] (cesar.pajaromiranda@canterbury.ac.nz) (University of Canterbury, New Zealand)
+* [Carlos A. Arteta] (carteta@uninorte.edu.co) (Universidad del Norte, Colombia)
