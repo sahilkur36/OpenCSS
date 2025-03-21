@@ -660,11 +660,11 @@ class HazardApp(QMainWindow):
         imt_tag = self.im_target_input.text()
         folder_sele = 'Selection_%s'%(imt_tag)
         
-        filename_CMS = 'CMS_for_%s.txt'%(imt_tag).replace('(','_')
+        filename_CMS = 'CSS_%s'%(imt_tag).replace('(','_')
         filename_CMS = filename_CMS.replace(')','')
         
         file_HazH = filename_CMS+"_HazH.out3"
-        file_MR = filename_CMS+"CS.out1"
+        file_MR = filename_CMS+"_CS.out1"
     
         try:
             # Leer el archivo
@@ -696,7 +696,7 @@ class HazardApp(QMainWindow):
             self.css_ax3.set_ylabel('Annual rate of being exceeded', fontdict={'fontsize': 12})
             self.css_ax3.set_xscale('log')
             self.css_ax3.set_yscale('log')
-            self.css_ax3.set_ylim([1/np.min(self.tr_list), 1/np.max(self.tr_list)]) 
+            self.css_ax3.set_ylim([1 / max(self.tr_list), 1 / min(self.tr_list)]) 
             self.css_ax3.grid(True, which="both", linestyle="--", linewidth=0.5)
             self.css_ax3.legend(scatterpoints=1, frameon=True, loc='upper right', handletextpad=0.2, columnspacing=0.20,
            ncol=1, fancybox=False, shadow=False, prop={'size': 10}, borderpad=0.2)
@@ -1958,7 +1958,7 @@ class HazardApp(QMainWindow):
         
         if source_type == "Crustal" :
             csv_name = "flatfile_NGA_West2_FullSet_V2.csv"
-            df_flatfile = pd.read_csv(os.path.join('Records_NGA', csv_name))
+            df_flatfile = pd.read_csv(os.path.join('Records_NGA', csv_name), skiprows = 3)
         elif source_type == "Intraslab" :
             csv_name = "NGAsubIntraslabFullSet.csv"
             df_flatfile = pd.read_csv(os.path.join('Records_NGA_Sub', csv_name))
