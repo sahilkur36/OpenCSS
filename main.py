@@ -35,6 +35,9 @@ from openquake.hazardlib.imt import SA, PGA
 from openquake.hazardlib.contexts import RuptureContext, SitesContext, DistancesContext
 import subprocess
 import time
+from PyQt5.QtGui import QMovie
+from PIL import Image
+import io
 
 # Lista para almacenar las GMPEs encontradas
 gmpe_classes = []
@@ -532,7 +535,7 @@ class HazardApp(QMainWindow):
         left_panel.addWidget(css_group)
         left_panel.addWidget(self.css_button)
         left_panel.addStretch()
-
+        
         # --------------- Panel Derecho (Gráficas) ---------------
         right_panel = QVBoxLayout()
         
@@ -549,14 +552,15 @@ class HazardApp(QMainWindow):
         self.css_figure3, self.css_ax3 = plt.subplots(figsize=(7, 6))
         self.css_canvas3 = FigureCanvas(self.css_figure3)
         
-        self.css_figure4, self.css_ax4 = plt.subplots(figsize=(7, 6))
-        self.css_canvas4 = FigureCanvas(self.css_figure4)
         
-        # Agregar las 4 figuras a la cuadrícula
-        grid_layout.addWidget(self.css_canvas1, 0, 0)  # Fila 0, Columna 0
-        grid_layout.addWidget(self.css_canvas2, 0, 1)  # Fila 0, Columna 1
-        grid_layout.addWidget(self.css_canvas3, 1, 0)  # Fila 1, Columna 0
-        grid_layout.addWidget(self.css_canvas4, 1, 1)  # Fila 1, Columna 1
+        self.gif_label = QLabel()
+        self.gif_label.setAlignment(Qt.AlignCenter)  # Centrar el gif
+        
+        # --------------- Agregar al grid_layout ---------------
+        grid_layout.addWidget(self.css_canvas1, 0, 0)
+        grid_layout.addWidget(self.css_canvas2, 0, 1)
+        grid_layout.addWidget(self.css_canvas3, 1, 0)
+        grid_layout.addWidget(self.gif_label, 1, 1)  # Fila 1, Columna 1
         
         # Agregar el layout de cuadrícula al panel derecho
         right_panel.addLayout(grid_layout)
@@ -654,6 +658,8 @@ class HazardApp(QMainWindow):
         
     def plot_css_calculation(self):
         
+        source_type = self.source_combo.currentText().strip()
+        
         tr_text = self.tr_input.text().strip()
         self.tr_list = [int(x.strip()) for x in tr_text.split(",") if x.strip()]
         
@@ -665,6 +671,10 @@ class HazardApp(QMainWindow):
         
         file_HazH = filename_CMS+"_HazH.out3"
         file_MR = filename_CMS+"_CS.out1"
+        flat_file = 'flatfile_%s.csv'%(source_type)
+        uhs_file = 'UHS_for_%s.xlsx'%(imt_tag)
+        sigma_file = 'SigmaCMS_for_%s.xlsx'%(imt_tag)
+        cms_file = 'CMS_for_%s.xlsx'%(imt_tag)
     
         try:
             # Leer el archivo
@@ -705,11 +715,24 @@ class HazardApp(QMainWindow):
             with open(os.path.join(folder_sele, file_MR), 'r') as file:
                 lines = file.readlines()
             data = [line.split() for line in lines[5:]]  
-            df_rates = pd.DataFrame(data[1:], columns=data[0])
+            df_rates = pd.DataFrame(data[1:], columns=data[0])                  
             df_rates['Mag'] = df_rates['Mag'].astype(float)
             df_rates['Rrup'] = df_rates['Rrup'].astype(float)
             df_rates['Rate'] = df_rates['Rate'].astype(float)
             df_rates['Rate_Initial'] = df_rates['Rate_Initial'].astype(float)
+            df_rates['RSN'] = df_rates['RSN'].astype(int)
+            df_rates['Scalefactor_h'] = df_rates['Scalefactor_h'].astype(float)
+            df_rates['HazLevel'] = df_rates['HazLevel'].astype(int)
+            
+            df_flatfile = pd.read_csv(os.path.join(folder_sele, flat_file), skiprows=3)
+            columns_periods = df_flatfile.columns[df_flatfile.columns.get_loc('T0.010s'):-3]
+            periods = [float(c[1:-1]) for c in columns_periods]
+            frames = []
+            haz_levels = sorted(df_rates['HazLevel'].unique())
+            
+            uhs_data = pd.read_excel(os.path.join(folder_sele, uhs_file), sheet_name='Sheet1')
+            sigma_data = pd.read_excel(os.path.join(folder_sele, sigma_file), sheet_name='Sheet1')
+            cms_data = pd.read_excel(os.path.join(folder_sele, cms_file), sheet_name='Sheet1')
             
             self.css_ax2.scatter(df_rates.Rrup, df_rates.Mag, alpha=0.65, edgecolor = 'k', linewidths = 0.5, color = 'darkblue', s= 50)
             self.css_ax2.set_title("Magnirude vs Rupture Distance", fontdict={'fontsize': 12})
@@ -727,6 +750,59 @@ class HazardApp(QMainWindow):
             self.css_ax1.grid(True, which="both", linestyle="--", linewidth=0.5)
             self.css_canvas1.draw()
             
+            
+            for hz in haz_levels:
+                fig, ax = plt.subplots()
+                
+                df_hz = df_rates[df_rates['HazLevel'] == hz]
+                spectra_list = []
+                
+                # Plotear cada espectro escalado en este Hazard Level
+                for _, row in df_hz.iterrows():
+                    rsn = int(row['RSN'])
+                    sf = float(row['Scalefactor_h'])
+                    
+                    spectrum = df_flatfile.loc[df_flatfile['Record Sequence Number'] == rsn, columns_periods].values.flatten()
+                    spectrum_scaled = spectrum * sf
+                    
+                    spectra_list.append(spectrum_scaled)
+                    ax.loglog(periods, spectrum_scaled, alpha=0.7, color = 'grey', lw = 1.0)
+                
+                spectra_array = np.array(spectra_list)
+                geo_mean = np.exp(np.mean(np.log(spectra_array), axis=0))
+                
+                ax.loglog(periods, geo_mean, color='red', linewidth=2.5)
+                ax.loglog(uhs_data.iloc[:,0], uhs_data.iloc[:,hz], marker='o', linestyle='-', color='black')
+                ax.loglog(sigma_data.iloc[:,0], np.array(cms_data.iloc[:,hz]) * np.exp(-2.5 * np.array(sigma_data.iloc[:,hz])), marker='', linestyle='--',color='black')
+                ax.loglog(sigma_data.iloc[:,0], np.array(cms_data.iloc[:,hz]) * np.exp(2.5 * np.array(sigma_data.iloc[:,hz])), marker='', linestyle='--',color='black')
+                
+                ax.set_xlabel('T (s)')
+                ax.set_ylabel('$Sa_{Rotd50}$ (g)', fontdict={'fontsize': 12})
+                ax.set_title(f'Hazard Level {hz}', fontdict={'fontsize': 12})
+                ax.grid(True, which='both', ls='--', alpha=0.5)
+                xmin = uhs_data.iloc[:,0][uhs_data.iloc[:,0] > 0].min()
+                xmax = uhs_data.iloc[:,0].max()
+                ax.set_xlim([xmin, xmax])
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                frames.append(Image.open(buf))
+            
+                plt.close()
+            
+            frames[0].save(os.path.join(folder_sele,
+                'Sarotd50_por_hazard.gif'),
+                format='GIF',
+                append_images=frames[1:],
+                save_all=True,
+                duration=800,  # 1 segundo por frame
+                loop=0
+            )
+            
+            gif_path = os.path.join(folder_sele, 'Sarotd50_por_hazard.gif')
+            self.movie = QMovie(gif_path)
+            self.gif_label.setMovie(self.movie)
+            self.movie.start()
             
         except Exception as e:
             print(f"❌ Error while Ploting CSS: {e}")
@@ -1672,7 +1748,7 @@ class HazardApp(QMainWindow):
         if self.tr_list:
             self.cms_tabs.setCurrentIndex(0)
             
-        return periods, cms_data, uhs_data, SigmaFileGMM, Rho_data, T0, Mags_Desag, Rs_Desag
+        return periods, cms_data, uhs_data, SigmaFileGMM, Rho_data, T0, Mags_Desag, Rs_Desag, sigma_cms_data
     
 
         
@@ -1734,7 +1810,7 @@ class HazardApp(QMainWindow):
          database_group = 'USGS'  
         else:
          database_group = 'Others'  
-        periods, cms, uhs, SigmaFileGMM, Rho_data, T0, Mags_Desag, Rs_Desag = self.perform_cms_calculation(imt_tag, folder_disaggregation, source_type, database_group, magnitude_text, distance_text)
+        periods, cms, uhs, SigmaFileGMM, Rho_data, T0, Mags_Desag, Rs_Desag, sigma_cms_data = self.perform_cms_calculation(imt_tag, folder_disaggregation, source_type, database_group, magnitude_text, distance_text)
         
         try:
             os.mkdir(os.path.join('Selection_%s'%(imt_tag)))
@@ -1742,13 +1818,15 @@ class HazardApp(QMainWindow):
             cms.to_excel(os.path.join('Selection_%s'%(imt_tag),'CMS_for_%s.xlsx'%(imt_tag)), index = False)
             SigmaFileGMM.to_excel(os.path.join('Selection_%s'%(imt_tag),'SigmaGMM_for_%s.xlsx'%(imt_tag)), index = False)
             Rho_data.to_excel(os.path.join('Selection_%s'%(imt_tag),'Rho_for_%s.xlsx'%(imt_tag)), index = False)
+            sigma_cms_data.to_excel(os.path.join('Selection_%s'%(imt_tag),'SigmaCMS_for_%s.xlsx'%(imt_tag)), index = False)
             
         except:
             uhs.to_excel(os.path.join('Selection_%s'%(imt_tag),'UHS_for_%s.xlsx'%(imt_tag)), index = False)
             cms.to_excel(os.path.join('Selection_%s'%(imt_tag),'CMS_for_%s.xlsx'%(imt_tag)), index = False)
             SigmaFileGMM.to_excel(os.path.join('Selection_%s'%(imt_tag),'SigmaGMM_for_%s.xlsx'%(imt_tag)), index = False)
             Rho_data.to_excel(os.path.join('Selection_%s'%(imt_tag),'Rho_for_%s.xlsx'%(imt_tag)), index = False)
-        
+            sigma_cms_data.to_excel(os.path.join('Selection_%s'%(imt_tag),'SigmaCMS_for_%s.xlsx'%(imt_tag)), index = False)
+            
         shutil.copyfile('ScenarioSpectra_2017.exe', os.path.join('Selection_%s'%(imt_tag),'ScenarioSpectra_2017.exe'))
         
         UHS_File = open('UHS_Inp.txt', 'r')
