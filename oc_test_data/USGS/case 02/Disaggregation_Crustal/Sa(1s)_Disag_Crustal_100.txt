@@ -1,0 +1,54 @@
+Metadata
+Model, Longitude, Latitude, IMT, Return Period, VS30
+CONUS_2018, -118.243, 34.052, SA1P0, 100, 365
+
+
+Disaggregation targets:
+	Return period: 100yrs
+	Exceedance rate: 0.01yr⁻¹
+	1.0 s SA ground motion: 0.22809231g
+
+Recovered targets:
+	Return period: 99.734116yrs
+	Exceedance rate: 0.010026659yr⁻¹
+
+Totals:
+	Binned: 100%
+	Residual: 0%
+	Trace: 0.6%
+
+Mean (over all sources):
+	m: 6.94
+	r: 29.75km
+	ε₀: 0.17σ
+
+Mode (largest m-r bin):
+	m: 6.34
+	r: 10.54km
+	ε₀: -0.21σ
+	Contribution: 9.22%
+
+Mode (largest m-r-ε₀ bin):
+	m: 6.35
+	r: 13.21km
+	ε₀: 0.2σ
+	Contribution: 3.07%
+
+Discretization:
+	r: min = 0.0, max = 1000.0, Δ = 20.0km
+	m: min = 4.4, max = 9.4, Δ = 0.2
+	ε: min = -3.0, max = 3.0, Δ = 0.5σ
+
+Epsilon keys:
+	ε0: [-∞ .. -2.5)
+	ε1: [-2.5 .. -2.0)
+	ε2: [-2.0 .. -1.5)
+	ε3: [-1.5 .. -1.0)
+	ε4: [-1.0 .. -0.5)
+	ε5: [-0.5 .. 0.0)
+	ε6: [0.0 .. 0.5)
+	ε7: [0.5 .. 1.0)
+	ε8: [1.0 .. 1.5)
+	ε9: [1.5 .. 2.0)
+	ε10: [2.0 .. 2.5)
+	ε11: [2.5 .. +∞]

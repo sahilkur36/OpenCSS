@@ -500,11 +500,29 @@ class HazardApp(QMainWindow):
         self.mmax_input = QLineEdit()
         self.rmin_input = QLineEdit()
         self.rmax_input = QLineEdit()
-        
+        self.vs30max_input = QLineEdit()
+        self.vs30min_input = QLineEdit()
+        self.PGVmax_input = QLineEdit()
+        self.PGVmin_input = QLineEdit()        
+        self.AImax_input = QLineEdit()
+        self.AImin_input = QLineEdit()
+        self.DURmax_input = QLineEdit()
+        self.DURmin_input = QLineEdit()
+        self.NumberSpectra_input = QLineEdit()
+
         self.mmin_input.setFixedWidth(60)
         self.mmax_input.setFixedWidth(60)
         self.rmin_input.setFixedWidth(60)
         self.rmax_input.setFixedWidth(60)
+        self.vs30max_input.setFixedWidth(60)
+        self.vs30min_input.setFixedWidth(60)   
+        self.PGVmax_input.setFixedWidth(60)
+        self.PGVmin_input.setFixedWidth(60)   
+        self.AImax_input.setFixedWidth(60)
+        self.AImin_input.setFixedWidth(60)
+        self.DURmax_input.setFixedWidth(60)
+        self.DURmin_input.setFixedWidth(60) 
+        self.NumberSpectra_input.setFixedWidth(120) 
 
         # Alinear los campos en un layout horizontal
         m_layout = QHBoxLayout()
@@ -518,11 +536,45 @@ class HazardApp(QMainWindow):
         r_layout.addWidget(self.rmin_input)
         r_layout.addWidget(QLabel("Rmax:"))
         r_layout.addWidget(self.rmax_input)
+        
+        vs30_layout = QHBoxLayout()
+        vs30_layout.addWidget(QLabel("Vs30 min:"))
+        vs30_layout.addWidget(self.vs30min_input)
+        vs30_layout.addWidget(QLabel("Vs30 max:"))
+        vs30_layout.addWidget(self.vs30max_input)
 
+        PGV_layout = QHBoxLayout()
+        PGV_layout.addWidget(QLabel("PGV min:"))
+        PGV_layout.addWidget(self.PGVmin_input)
+        PGV_layout.addWidget(QLabel("PGV max:"))
+        PGV_layout.addWidget(self.PGVmax_input)
+
+        AI_layout = QHBoxLayout()
+        AI_layout.addWidget(QLabel("AI min:"))
+        AI_layout.addWidget(self.AImin_input)
+        AI_layout.addWidget(QLabel("AI max:"))
+        AI_layout.addWidget(self.AImax_input)
+
+        Dur_layout = QHBoxLayout()
+        Dur_layout.addWidget(QLabel("Dur min:"))
+        Dur_layout.addWidget(self.DURmin_input)
+        Dur_layout.addWidget(QLabel("Dur max:"))
+        Dur_layout.addWidget(self.DURmax_input)
+
+        Spectra_layout = QHBoxLayout()
+        Spectra_layout.addWidget(QLabel("# Spectra per HZ Level:"))
+        Spectra_layout.addWidget(self.NumberSpectra_input)
+
+        
         # Agregar los campos al layout del grupo
         css_layout.addLayout(m_layout)
         css_layout.addLayout(r_layout)
-
+        css_layout.addLayout(vs30_layout)
+        css_layout.addLayout(PGV_layout)
+        css_layout.addLayout(AI_layout)
+        css_layout.addLayout(Dur_layout)
+        css_layout.addLayout(Spectra_layout)
+        
         css_group.setLayout(css_layout)
 
         # -------------- Botón para ejecutar CSS Calculation --------------
@@ -590,72 +642,362 @@ class HazardApp(QMainWindow):
         self.css_tab.setLayout(main_layout)
 
     def run_scenario_spectra(self):
-        """Ejecuta ScenarioSpectra_2017.exe dentro de 'Selection_Sa(1s)' y escribe 'Main_CSS.txt' seguido de Enter."""
+        """Ejecuta ScenarioSpectra_2017.exe dentro de 'Selection_Sa(Xs)' y escribe 'Main_CSS.txt' seguido de Enter."""
         
-        imt_tag = self.im_target_input.text()
-        folder_sele = 'Selection_%s'%(imt_tag)
-        
-        try:
-            # Ruta del ejecutable y el archivo Main_CSS.txt
-            selection_folder = folder_sele
-            exe_path = os.path.join(selection_folder, "ScenarioSpectra_2017.exe")
-            input_file = os.path.join(selection_folder, "Main_CSS.txt")
-
-            # Verificar si el ejecutable y el archivo existen
-            if not os.path.exists(exe_path):
-                QMessageBox.critical(self, "Error", f"No se encontró '{exe_path}'")
-                return
+        if self.default_checkbox.isChecked(): 
+            imt_tag = self.im_target_input.text()
+            folder_sele = 'Selection_%s'%(imt_tag)
             
-            if not os.path.exists(input_file):
-                QMessageBox.critical(self, "Error", f"No se encontró '{input_file}'")
-                return
-
-            # Ejecutar el programa dentro de la carpeta correcta
-            process = subprocess.Popen(
-                exe_path,
-                cwd=selection_folder,  # 💡 Cambia el directorio de trabajo al de la carpeta
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                bufsize=1 
-            )
-
-            # Escribir en la entrada estándar
-            process.stdin.write("Main_CSS.txt\n")
-            process.stdin.write("\n")
-            process.stdin.write("\n") # Segundo Enter
-            process.stdin.flush()  
-
-            # Leer la salida en tiempo real y detectar "monte carlo"
-            monte_carlo_detected = False
-            while True:
-                output = process.stdout.readline()
-                if output == "" and process.poll() is not None:
-                    break
-                if output:
-                    print(output.strip())  # Mostrar en consola
+            try:
+                # Ruta del ejecutable y el archivo Main_CSS.txt
+                selection_folder = folder_sele
+                exe_path = os.path.join(selection_folder, "ScenarioSpectra_2017.exe")
+                input_file = os.path.join(selection_folder, "Main_CSS.txt")
     
-                    # Si se detecta "monte carlo", enviar el último ENTER
-                    if "monte carlo" in output.lower():
-                        time.sleep(0.5)  # Pequeña espera antes de enviar ENTER
-                        process.stdin.write("\n")
-                        process.stdin.flush()
-                        monte_carlo_detected = True
+                # Verificar si el ejecutable y el archivo existen
+                if not os.path.exists(exe_path):
+                    QMessageBox.critical(self, "Error", f"No se encontró '{exe_path}'")
+                    return
+                
+                if not os.path.exists(input_file):
+                    QMessageBox.critical(self, "Error", f"No se encontró '{input_file}'")
+                    return
     
-            # Leer posibles errores
-            stderr_output = process.stderr.read()
-            if stderr_output:
-                print(f"❌ Error: {stderr_output}")
+                # Ejecutar el programa dentro de la carpeta correcta
+                process = subprocess.Popen(
+                    exe_path,
+                    cwd=selection_folder,  # 💡 Cambia el directorio de trabajo al de la carpeta
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    bufsize=1 
+                )
     
-            if monte_carlo_detected:
-                QMessageBox.information(self, "Success", "CSS Calculation Completed Successfully!")
-            else:
-                QMessageBox.warning(self, "Warning", "The 'monte carlo' step was not detected. Check the process output.")
+                # Escribir en la entrada estándar
+                process.stdin.write("Main_CSS.txt\n")
+                process.stdin.write("\n")
+                #process.stdin.write("\n") # Segundo Enter
+                process.stdin.flush()  
     
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error al ejecutar el programa:\n{e}")
+                # Leer la salida en tiempo real y detectar "monte carlo"
+                monte_carlo_detected = False
+                while True:
+                    output = process.stdout.readline()
+                    if output == "" and process.poll() is not None:
+                        break
+                    if output:
+                        print(output.strip())  # Mostrar en consola
         
+                        # Si se detecta "monte carlo", enviar el último ENTER
+                        if "monte carlo" in output.lower():
+                            time.sleep(0.5)  # Pequeña espera antes de enviar ENTER
+                            process.stdin.write("\n")
+                            process.stdin.flush()
+                            monte_carlo_detected = True
+        
+                # Leer posibles errores
+                stderr_output = process.stderr.read()
+                if stderr_output:
+                    print(f"Warning: {stderr_output}")
+        
+                if monte_carlo_detected:
+                    QMessageBox.information(self, "Success", "CSS Calculation Completed Successfully!")
+                else:
+                    QMessageBox.warning(self, "Warning", "The 'monte carlo' step was not detected. Check the process output.")
+        
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error al ejecutar el programa:\n{e}")
+     
+        elif self.personalized_checkbox.isChecked():
+            
+            imt_tag = self.im_target_input.text()
+            folder_sele = 'Selection_%s'%(imt_tag)
+            source_type = self.source_combo.currentText().strip()
+            
+            if source_type == "Crustal" :
+                csv_name = "flatfile_NGA_West2_FullSet_V2.csv"
+                df_flatfile = pd.read_csv(os.path.join('Records_NGA', csv_name), skiprows = 3)
+            elif source_type == "Intraslab" :
+                csv_name = "NGAsubIntraslabFullSet.csv"
+                df_flatfile = pd.read_csv(os.path.join('Records_NGA_Sub', csv_name))
+            else:
+                csv_name = "NGAsubInterfaceFullSet.csv"
+                df_flatfile = pd.read_csv(os.path.join('Records_NGA_Sub', csv_name)) 
+            
+            df_header= pd.read_csv(os.path.join('Records_NGA','flatfile_NGA_West2_FullSet_V2.csv'), nrows=3, header=None)
+            line1 = df_header.iloc[0].fillna('').tolist()
+            line2 = df_header.iloc[1].fillna('').tolist()
+            line3 = df_header.iloc[2].fillna('').tolist()
+            data_as_list = [line1, line2, line3]
+            
+                       
+            if self.mmin_input.text().strip() and self.mmax_input.text().strip():
+                try:
+                    mmin = float(self.mmin_input.text().strip())
+                    mmax = float(self.mmax_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[5].split()
+                    line_split[0] = f'{mmin:.1f}'
+                    line_split[1] = f'{mmax:.1f}'
+                    Inp_File_Content[5] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+                    
+                    df_filtered = df_flatfile[
+                        (df_flatfile['Earthquake Magnitude'] >= (mmin)) & 
+                        (df_flatfile['Earthquake Magnitude'] <= (mmax))
+                    ]
+                    
+                    df_filtered = df_filtered[
+                        (df_filtered['ClstD (km)'] >= (np.min(self.rs_desag))) & 
+                        (df_filtered['ClstD (km)'] <= (np.max(self.rs_desag) + 10))
+                    ]
+                    
+                    if df_filtered.shape[0] <= 595:
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+                    else: 
+                       df_filtered = df_filtered.sample(n=595, random_state=42)
+                       df_filtered = df_filtered.sort_values(by='Record Sequence Number')
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)  
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+
+
+                except ValueError:
+                    print("❌ Mmin o Mmax.")
+                    
+            if self.rmin_input.text().strip() and self.rmax_input.text().strip():
+                try:
+                    rmin = float(self.rmin_input.text().strip())
+                    rmax = float(self.rmax_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[7].split()
+                    line_split[0] = f'{rmin:.1f}'
+                    line_split[1] = f'{rmax:.1f}'
+                    Inp_File_Content[7] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+                    
+                    df_filtered = df_flatfile[
+                        (df_flatfile['Earthquake Magnitude'] >= (np.min(self.mg_desag))) & 
+                        (df_flatfile['Earthquake Magnitude'] <= (np.max(self.mg_desag)))
+                    ]
+                    
+                    df_filtered = df_filtered[
+                        (df_filtered['ClstD (km)'] >= (rmin)) & 
+                        (df_filtered['ClstD (km)'] <= (rmax))
+                    ]
+                    
+                    if df_filtered.shape[0] <= 595:
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+                    else: 
+                       df_filtered = df_filtered.sample(n=595, random_state=42)
+                       df_filtered = df_filtered.sort_values(by='Record Sequence Number')
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)  
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+
+                except ValueError:
+                    print("❌ Rmin o Rmax.")
+
+            if self.rmin_input.text().strip() and self.rmax_input.text().strip() and self.mmin_input.text().strip() and self.mmax_input.text().strip():
+                try: 
+                    mmin = float(self.mmin_input.text().strip())
+                    mmax = float(self.mmax_input.text().strip())                    
+                    rmin = float(self.rmin_input.text().strip())
+                    rmax = float(self.rmax_input.text().strip())
+                    
+                    
+                    df_filtered = df_flatfile[
+                        (df_flatfile['Earthquake Magnitude'] >= (mmin)) & 
+                        (df_flatfile['Earthquake Magnitude'] <= (mmax))
+                    ]
+                    
+                    df_filtered = df_filtered[
+                        (df_filtered['ClstD (km)'] >= (rmin)) & 
+                        (df_filtered['ClstD (km)'] <= (rmax))
+                    ]
+                    
+                    if df_filtered.shape[0] <= 595:
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+                    else: 
+                       df_filtered = df_filtered.sample(n=595, random_state=42)
+                       df_filtered = df_filtered.sort_values(by='Record Sequence Number')
+                       data_as_list.append(list(df_filtered.columns))  
+                       data_as_list.extend(df_filtered.values.tolist())
+                       result_df = pd.DataFrame(data_as_list)  
+                       result_df.to_csv(os.path.join('Selection_%s'%(imt_tag),'flatfile_%s.csv'%(source_type)), index=None, header=None)
+
+                except ValueError:
+                    print("❌ Mmin o Mmax o Rmin o Rmax.")
+
+            if self.vs30min_input.text().strip() and self.vs30max_input.text().strip():
+                try:
+                    vs30min = float(self.vs30min_input.text().strip())
+                    vs30max = float(self.vs30max_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[8].split()
+                    line_split[0] = f'{vs30min:.1f}'
+                    line_split[1] = f'{vs30max:.1f}'
+                    Inp_File_Content[8] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+
+                except ValueError:
+                    print("❌ Vs30 min o Vs30 max.")
+                    
+            if self.DURmin_input.text().strip() and self.DURmax_input.text().strip():
+                try:
+                    DURmin = float(self.DURmin_input.text().strip())
+                    DURmax = float(self.DURmax_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[9].split()
+                    line_split[0] = f'{DURmin:.1f}'
+                    line_split[1] = f'{DURmax:.1f}'
+                    Inp_File_Content[9] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+
+                except ValueError:
+                    print("❌ DUR min o DUR max.")
+
+            if self.PGVmin_input.text().strip() and self.PGVmax_input.text().strip():
+                try:
+                    PGVmin = float(self.PGVmin_input.text().strip())
+                    PGVmax = float(self.PGVmax_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[10].split()
+                    line_split[0] = f'{PGVmin:.1f}'
+                    line_split[1] = f'{PGVmax:.1f}'
+                    Inp_File_Content[10] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+
+                except ValueError:
+                    print("❌ PGV min o PGV max.")
+
+            if self.AImin_input.text().strip() and self.AImax_input.text().strip():
+                try:
+                    AImin = float(self.AImin_input.text().strip())
+                    AImax = float(self.AImax_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[11].split()
+                    line_split[0] = f'{AImin:.1f}'
+                    line_split[1] = f'{AImax:.1f}'
+                    Inp_File_Content[11] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+
+                except ValueError:
+                    print("❌ DUR min o DUR max.")
+                    
+            if self.NumberSpectra_input.text().strip():
+                try:
+                    NumberSpectra = float(self.NumberSpectra_input.text().strip())
+                    
+                    Main_File = open(os.path.join(folder_sele, 'Main_CSS.txt'), 'r')
+                    Inp_File_Content = Main_File.readlines()
+                    line_split = Inp_File_Content[12].split()
+                    line_split[0] = f'{NumberSpectra:.0f}'
+                    Inp_File_Content[12] = '\t'.join(line_split) + '\n'
+                    
+                    with open(os.path.join('Selection_%s'%(imt_tag),'Main_CSS.txt'), 'w') as f_out:
+                        f_out.writelines(Inp_File_Content)
+
+                except ValueError:
+                    print("❌ Number of cenario spectra per hazard level")
+            
+            try:
+                # Ruta del ejecutable y el archivo Main_CSS.txt
+                selection_folder = folder_sele
+                exe_path = os.path.join(selection_folder, "ScenarioSpectra_2017.exe")
+                input_file = os.path.join(selection_folder, "Main_CSS.txt")
+    
+                # Verificar si el ejecutable y el archivo existen
+                if not os.path.exists(exe_path):
+                    QMessageBox.critical(self, "Error", f"No se encontró '{exe_path}'")
+                    return
+                
+                if not os.path.exists(input_file):
+                    QMessageBox.critical(self, "Error", f"No se encontró '{input_file}'")
+                    return
+    
+                # Ejecutar el programa dentro de la carpeta correcta
+                process = subprocess.Popen(
+                    exe_path,
+                    cwd=selection_folder,  # 💡 Cambia el directorio de trabajo al de la carpeta
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    bufsize=1 
+                )
+    
+                # Escribir en la entrada estándar
+                process.stdin.write("Main_CSS.txt\n")
+                process.stdin.write("\n")
+                #process.stdin.write("\n") # Segundo Enter
+                process.stdin.flush()  
+    
+                # Leer la salida en tiempo real y detectar "monte carlo"
+                monte_carlo_detected = False
+                while True:
+                    output = process.stdout.readline()
+                    if output == "" and process.poll() is not None:
+                        break
+                    if output:
+                        print(output.strip())  # Mostrar en consola
+        
+                        # Si se detecta "monte carlo", enviar el último ENTER
+                        if "monte carlo" in output.lower():
+                            time.sleep(0.5)  # Pequeña espera antes de enviar ENTER
+                            process.stdin.write("\n")
+                            process.stdin.flush()
+                            monte_carlo_detected = True
+        
+                # Leer posibles errores
+                stderr_output = process.stderr.read()
+                if stderr_output:
+                    print(f"Warning: {stderr_output}")
+        
+                if monte_carlo_detected:
+                    QMessageBox.information(self, "Success", "CSS Calculation Completed Successfully!")
+                else:
+                    QMessageBox.warning(self, "Warning", "The 'monte carlo' step was not detected. Check the process output.")
+        
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error al ejecutar el programa:\n{e}")
+            
     def plot_css_calculation(self):
         
         source_type = self.source_combo.currentText().strip()
@@ -672,7 +1014,6 @@ class HazardApp(QMainWindow):
         file_HazH = filename_CMS+"_HazH.out3"
         file_MR = filename_CMS+"_CS.out1"
         flat_file = 'flatfile_%s.csv'%(source_type)
-        uhs_file = 'UHS_for_%s.xlsx'%(imt_tag)
         sigma_file = 'SigmaCMS_for_%s.xlsx'%(imt_tag)
         cms_file = 'CMS_for_%s.xlsx'%(imt_tag)
     
@@ -725,15 +1066,15 @@ class HazardApp(QMainWindow):
             df_rates['HazLevel'] = df_rates['HazLevel'].astype(int)
             
             df_flatfile = pd.read_csv(os.path.join(folder_sele, flat_file), skiprows=3)
-            columns_periods = df_flatfile.columns[df_flatfile.columns.get_loc('T0.010s'):-3]
+            columns_periods = df_flatfile.columns[df_flatfile.columns.get_loc('T0.010S'):-3]
             periods = [float(c[1:-1]) for c in columns_periods]
             frames = []
             haz_levels = sorted(df_rates['HazLevel'].unique())
             
-            uhs_data = pd.read_excel(os.path.join(folder_sele, uhs_file), sheet_name='Sheet1')
             sigma_data = pd.read_excel(os.path.join(folder_sele, sigma_file), sheet_name='Sheet1')
             cms_data = pd.read_excel(os.path.join(folder_sele, cms_file), sheet_name='Sheet1')
             
+            self.css_ax2.clear()
             self.css_ax2.scatter(df_rates.Rrup, df_rates.Mag, alpha=0.65, edgecolor = 'k', linewidths = 0.5, color = 'darkblue', s= 50)
             self.css_ax2.set_title("Magnirude vs Rupture Distance", fontdict={'fontsize': 12})
             self.css_ax2.set_xlabel('Rupture Distance [km]', fontdict={'fontsize': 12})
@@ -741,6 +1082,7 @@ class HazardApp(QMainWindow):
             self.css_ax2.grid(True, which="both", linestyle="--", linewidth=0.5)
             self.css_canvas2.draw()
             
+            self.css_ax1.clear()
             self.css_ax1.semilogy(df_rates.Rate, '.k', label = 'Final rate', markersize = 7.5)
             self.css_ax1.semilogy(df_rates.Rate_Initial, '.', color = 'darkred', label = 'Initial rate', markersize = 7.5)
             self.css_ax1.set_title("Initial Rate vs Final Rate", fontdict={'fontsize': 12})
@@ -772,7 +1114,7 @@ class HazardApp(QMainWindow):
                 geo_mean = np.exp(np.mean(np.log(spectra_array), axis=0))
                 
                 ax.loglog(periods, geo_mean, color='red', linewidth=2.5)
-                ax.loglog(uhs_data.iloc[:,0], uhs_data.iloc[:,hz], marker='o', linestyle='-', color='black')
+                ax.loglog(cms_data.iloc[:,0], cms_data.iloc[:,hz], marker='o', linestyle='-', color='black')
                 ax.loglog(sigma_data.iloc[:,0], np.array(cms_data.iloc[:,hz]) * np.exp(-2.5 * np.array(sigma_data.iloc[:,hz])), marker='', linestyle='--',color='black')
                 ax.loglog(sigma_data.iloc[:,0], np.array(cms_data.iloc[:,hz]) * np.exp(2.5 * np.array(sigma_data.iloc[:,hz])), marker='', linestyle='--',color='black')
                 
@@ -780,9 +1122,10 @@ class HazardApp(QMainWindow):
                 ax.set_ylabel('$Sa_{Rotd50}$ (g)', fontdict={'fontsize': 12})
                 ax.set_title(f'Hazard Level {hz}', fontdict={'fontsize': 12})
                 ax.grid(True, which='both', ls='--', alpha=0.5)
-                xmin = uhs_data.iloc[:,0][uhs_data.iloc[:,0] > 0].min()
-                xmax = uhs_data.iloc[:,0].max()
+                xmin = cms_data.iloc[:,0][cms_data.iloc[:,0] > 0].min()
+                xmax = cms_data.iloc[:,0].max()
                 ax.set_xlim([xmin, xmax])
+                ax.set_ylim([1e-3, 1e1])
                 buf = io.BytesIO()
                 plt.savefig(buf, format='png')
                 buf.seek(0)
@@ -813,7 +1156,9 @@ class HazardApp(QMainWindow):
         enabled = self.personalized_checkbox.isChecked()
 
         # Bloquear/desbloquear los campos según la opción seleccionada
-        for field in [self.mmin_input, self.mmax_input, self.rmin_input, self.rmax_input]:
+        for field in [self.mmin_input, self.mmax_input, self.rmin_input, self.rmax_input, self.PGVmax_input,
+                      self.PGVmin_input, self.AImin_input, self.AImax_input, self.vs30max_input, self.vs30min_input,
+                      self.DURmax_input, self.DURmin_input, self.NumberSpectra_input]:
             field.setReadOnly(not enabled)
             field.setStyleSheet("background-color: lightgray;" if not enabled else "")
             
@@ -1164,6 +1509,7 @@ class HazardApp(QMainWindow):
                 self.Disaggregation_Tabs.clear()
                 dissaggregation_folder = self.folder_input_hazard.text()
                 List_Desag_Source = os.listdir(dissaggregation_folder)
+                List_Desag_Source.sort(key=lambda x: int(re.findall(r'\d+', x)[0]))
                 for dissaggregation_file in List_Desag_Source:
                     # Leer el archivo línea por línea
                     with open(os.path.join(dissaggregation_folder, dissaggregation_file), "r", encoding="utf-8") as file:
@@ -1748,6 +2094,9 @@ class HazardApp(QMainWindow):
         if self.tr_list:
             self.cms_tabs.setCurrentIndex(0)
             
+        self.mags_desag = Mags_Desag
+        self.rs_desag = Rs_Desag
+        
         return periods, cms_data, uhs_data, SigmaFileGMM, Rho_data, T0, Mags_Desag, Rs_Desag, sigma_cms_data
     
 
@@ -2009,8 +2358,8 @@ class HazardApp(QMainWindow):
         
         Inp_File_Content[2] = Inp_File_Content[2].replace('0.75\t', '%0.3f\t'%(T0)) #T*
         Inp_File_Content[4] = Inp_File_Content[4].replace('0.15\t1.125\t', '%0.3f\t%0.3f\t'%(0.2*T0, 2.0*T0)) 
-        Inp_File_Content[5] = Inp_File_Content[5].replace('2.0\t8.0\t', '%0.1f\t%0.1f\t'%(np.min(Mags_Desag) - 1.0, np.max(Mags_Desag) + 1.0))
-        Inp_File_Content[7] = Inp_File_Content[7].replace('0.0    1000.0\t', '%0.1f    %0.1f\t'%(np.max([np.min(Rs_Desag)]) - 10, np.max(Rs_Desag) + 50))
+        Inp_File_Content[5] = Inp_File_Content[5].replace('2.0\t8.0\t', '%0.1f\t%0.1f\t'%(np.min(Mags_Desag) - 0.5, np.max(Mags_Desag) + 0.5))
+        Inp_File_Content[7] = Inp_File_Content[7].replace('0.0    1000.0\t', '%0.1f    %0.1f\t'%(np.max([np.min(Rs_Desag)]), np.max(Rs_Desag) + 10))
         Inp_File_Content[8] = Inp_File_Content[8].replace('300.0  435.0\t', '%0.1f    %0.1f\t'%(0, 3000))
         Inp_File_Content[12] = Inp_File_Content[12].replace('32\t', '%0.0f'%(32))
         
@@ -2052,13 +2401,13 @@ class HazardApp(QMainWindow):
         data_as_list = [line1, line2, line3]
         
         df_filtered = df_flatfile[
-            (df_flatfile['Earthquake Magnitude'] >= (np.min(Mags_Desag) - 1.0)) & 
-            (df_flatfile['Earthquake Magnitude'] <= (np.max(Mags_Desag) + 1.0))
+            (df_flatfile['Earthquake Magnitude'] >= (np.min(Mags_Desag) - 0.5)) & 
+            (df_flatfile['Earthquake Magnitude'] <= (np.max(Mags_Desag) + 0.5))
         ]
         
         df_filtered = df_filtered[
-            (df_filtered['ClstD (km)'] >= (np.min(Rs_Desag) - 10)) & 
-            (df_filtered['ClstD (km)'] <= (np.max(Rs_Desag) + 50))
+            (df_filtered['ClstD (km)'] >= (np.min(Rs_Desag))) & 
+            (df_filtered['ClstD (km)'] <= (np.max(Rs_Desag) + 10))
         ]
         
         if df_filtered.shape[0] <= 595:
