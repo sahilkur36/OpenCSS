@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QFileDialog, QButtonGroup, QRadioButton, QTabWidget,
     QMessageBox, QWidget, QSplitter, QComboBox, QGroupBox, QListWidget, QDoubleSpinBox, QInputDialog, QSizePolicy
-    , QGridLayout, QCheckBox
+    , QGridLayout, QCheckBox 
 )
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
@@ -35,7 +35,7 @@ from openquake.hazardlib.imt import SA, PGA
 from openquake.hazardlib.contexts import RuptureContext, SitesContext, DistancesContext
 import subprocess
 import time
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QMovie, QPixmap
 from PIL import Image
 import io
 
@@ -214,10 +214,22 @@ class HazardApp(QMainWindow):
         self.plot_hazard_button.clicked.connect(self.plot_disaggregation_results)     
         
         left_panel.addWidget(self.plot_hazard_button)
-
         
-        # Esto evita espacios vacíos adicionales debajo del último botón
+        logo_label = QLabel()
+        pixmap = QPixmap("Logo_Uninorte.png")
+        pixmap = pixmap.scaledToWidth(150)  
+        logo_label.setPixmap(pixmap)
+        logo_label.setAlignment(Qt.AlignCenter)
+        
+        credits_label = QLabel("(Caballero, Pájaro & Arteta)")
+        credits_label.setAlignment(Qt.AlignCenter)
+        credits_label.setStyleSheet("font-style: italic; font-size: 9pt; font-weight: bold;")
+        
         left_panel.addStretch()
+        left_panel.addWidget(logo_label)
+        left_panel.addWidget(credits_label)
+
+
 
         # --------------- Panel Derecho (Gráficas) ---------------
         right_panel = QVBoxLayout()
@@ -579,7 +591,8 @@ class HazardApp(QMainWindow):
 
         # -------------- Botón para ejecutar CSS Calculation --------------
         self.css_button = QPushButton("Run CSS Calculation")
-        self.css_button.setFixedSize(130, 30)
+        self.css_button.setStyleSheet("font-weight: bold;")
+        self.css_button.setFixedSize(140, 30)
         self.css_button.clicked.connect(self.run_scenario_spectra) 
         self.css_button.clicked.connect(self.plot_css_calculation)
         
